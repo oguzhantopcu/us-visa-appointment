@@ -4,7 +4,7 @@ const axios = require('axios');
 
 (async () => {
     //#region Command line args
-    const args = parseArgs(process.argv.slice(2), {string: ['u', 'p', 'c', 'a', 'n', 'd', 'r'], boolean: ['g']})
+    const args = parseArgs(process.argv.slice(2), {string: ['u', 'p', 'c', 'a', 'n', 'd', 'r', "mn", "l"], boolean: ['g']})
     const currentDate = new Date(args.d);
     const usernameInput = args.u;
     const passwordInput = args.p;
@@ -12,6 +12,7 @@ const axios = require('axios');
     const retryTimeout = args.t * 1000;
     const consularId = args.c;
     const userToken = args.n;
+    const appToken = args.m;
     const groupAppointment = args.g;
     const lang = args.l;
     const region = args.r;
@@ -115,10 +116,13 @@ const axios = require('axios');
         return;
       }
 
-      const pushOverAppToken = 'a5o8qtigtvu3yyfaeehtnzfkm88zc9';
+      if (!appToken) {
+        return;
+      }
+
       const apiEndpoint = 'https://api.pushover.net/1/messages.json';
       const data = {
-        token: pushOverAppToken, 
+        token: appToken, 
         user: userToken,
         message: msg
       };
@@ -203,7 +207,7 @@ const axios = require('axios');
       {
           const targetPage = page;
           const element = await waitForSelectors([["aria/Password"],["#user_password"]], targetPage, { timeout, visible: true });
-		  await scrollIntoViewIfNeeded(element, timeout);
+		      await scrollIntoViewIfNeeded(element, timeout);
           const type = await element.evaluate(el => el.type);
           if (["textarea","select-one","text","url","tel","search","password","number","email"].includes(type)) {
             await element.type(passwordInput);
@@ -355,12 +359,14 @@ const axios = require('axios');
       //#endregion
     }
 
+    notify("test notification");
+
     while (true){
       try{
         const result = await runLogic();
 
         if (result){
-          notify("Successfully scheduled a new appointment");
+          notify("successfully scheduled a new appointment");
           break;
         }
       } catch (err){
