@@ -13,6 +13,7 @@ const axios = require('axios');
     const consularId = args.c;
     const userToken = args.n;
     const groupAppointment = args.g;
+    const lang = args.l;
     const region = args.r;
     //#endregion
 	
@@ -117,7 +118,7 @@ const axios = require('axios');
       const pushOverAppToken = 'a5o8qtigtvu3yyfaeehtnzfkm88zc9';
       const apiEndpoint = 'https://api.pushover.net/1/messages.json';
       const data = {
-        token: pushOverAppToken,
+        token: pushOverAppToken, 
         user: userToken,
         message: msg
       };
@@ -127,8 +128,15 @@ const axios = require('axios');
     //#endregion
 
     async function runLogic() {
+      log("launching browser...");
+
       //#region Init puppeteer
-      const browser = await puppeteer.launch();
+      const browser = await puppeteer.launch({
+        headless: true
+      });
+
+      log("launched");
+
       // Comment above line and uncomment following line to see puppeteer in action
       //const browser = await puppeteer.launch({ headless: false });
       const page = await browser.newPage();
@@ -141,19 +149,21 @@ const axios = require('axios');
 
       //#region Logic
 	  
-      // Set the viewport to avoid elements changing places 
+      log("set the viewport to avoid elements changing places ");
+
       {
           const targetPage = page;
           await targetPage.setViewport({"width":2078,"height":1479})
       }
 
-      // Go to login page
+      log("go to login page");
+      
       {
           const targetPage = page;
-          await targetPage.goto('https://ais.usvisa-info.com/en-' + region + '/niv/users/sign_in', { waitUntil: 'domcontentloaded' });
+          await targetPage.goto('https://ais.usvisa-info.com/' + lang + '-' + region + '/niv/users/sign_in', { waitUntil: 'domcontentloaded' });
       }
 
-      // Click on username input
+      log("click on username input");
       {
           const targetPage = page;
           const element = await waitForSelectors([["aria/Email *"],["#user_email"]], targetPage, { timeout, visible: true });
@@ -161,7 +171,7 @@ const axios = require('axios');
           await element.click({ offset: { x: 118, y: 21.453125} });
       }
 
-      // Type username
+      log("type username");
       {
           const targetPage = page;
           const element = await waitForSelectors([["aria/Email *"],["#user_email"]], targetPage, { timeout, visible: true });
@@ -179,7 +189,7 @@ const axios = require('axios');
           }
       }
 	  
-      // Hit tab to go to the password input
+      log("hit tab to go to the password input");
       {
           const targetPage = page;
           await targetPage.keyboard.down("Tab");
@@ -189,7 +199,7 @@ const axios = require('axios');
           await targetPage.keyboard.up("Tab");
       }
 	  
-      // Type password
+      log("type password");
       {
           const targetPage = page;
           const element = await waitForSelectors([["aria/Password"],["#user_password"]], targetPage, { timeout, visible: true });
@@ -207,7 +217,7 @@ const axios = require('axios');
           }
       }
 	  
-      // Tick the checkbox for agreement
+      log("tick the checkbox for agreement");
       {
           const targetPage = page;
           const element = await waitForSelectors([["#sign_in_form > div.radio-checkbox-group.margin-top-30 > label > div"]], targetPage, { timeout, visible: true });
@@ -215,24 +225,28 @@ const axios = require('axios');
           await element.click({ offset: { x: 9, y: 16.34375} });
       }
       
-      // Click login button
+      log("click login button");
       {
           const targetPage = page;
-          const element = await waitForSelectors([["aria/Sign In[role=\"button\"]"],["#new_user > p:nth-child(9) > input"]], targetPage, { timeout, visible: true });
+          const element = await waitForSelectors([["[name=\"commit\"]"],["#new_user > p:nth-child(9) > input"]], targetPage, { timeout, visible: true });
           await scrollIntoViewIfNeeded(element, timeout);
           await element.click({ offset: { x: 34, y: 11.34375} });
           await targetPage.waitForNavigation();
       }
 
-      // We are logged in now. Check available dates from the API
+      log("we are logged in now. check available dates from the API");
       {
           const targetPage = page;
-          const response = await targetPage.goto('https://ais.usvisa-info.com/en-' + region + '/niv/schedule/' + appointmentId + '/appointment/days/' + consularId + '.json?appointments[expedite]=false');
+          await page.setExtraHTTPHeaders({
+            'Accept': 'application/json, text/javascript, */*; q=0.01',
+            'X-Requested-With': 'XMLHttpRequest'
+          });
+          const response = await targetPage.goto('https://ais.usvisa-info.com/' + lang + '-' + region + '/niv/schedule/' + appointmentId + '/appointment/days/' + consularId + '.json?appointments[expedite]=false');
 
           const availableDates = JSON.parse(await response.text());
 
           if (availableDates.length <= 0) {
-            log("There are no available dates for consulate with id " + consularId);
+            log("there are no available dates for consulate with id " + consularId);
             await browser.close();
             return false;
           }
@@ -240,7 +254,7 @@ const axios = require('axios');
           const firstDate = new Date(availableDates[0].date);
 
           if (firstDate > currentDate) {
-            log("There is not an earlier date available than " + currentDate.toISOString().slice(0,10));
+            log("there is not an earlier date available than " + currentDate.toISOString().slice(0,10));
             await browser.close();
             return false;
           }
@@ -248,14 +262,14 @@ const axios = require('axios');
           notify("Found an earlier date! " + firstDate.toISOString().slice(0,10));
       }    
 
-      // Go to appointment page
+      log("go to appointment page");
       {
           const targetPage = page;
-          await targetPage.goto('https://ais.usvisa-info.com/en-' + region + '/niv/schedule/' + appointmentId + '/appointment', { waitUntil: 'domcontentloaded' });
+          await targetPage.goto('https://ais.usvisa-info.com/' + lang + '-' + region + '/niv/schedule/' + appointmentId + '/appointment', { waitUntil: 'domcontentloaded' });
           await sleep(1000);
       }     
 
-      // Select multiple people if it is a group appointment
+      log("select multiple people if it is a group appointment");
       {
           if(groupAppointment){
             const targetPage = page;
@@ -266,7 +280,7 @@ const axios = require('axios');
           }
       }
 
-      // Select the specified consular from the dropdown
+      log("select the specified consular from the dropdown");
       {
           const targetPage = page;
           const element = await waitForSelectors([["aria/Consular Section Appointment","aria/[role=\"combobox\"]"],["#appointments_consulate_appointment_facility_id"]], targetPage, { timeout, visible: true });
@@ -275,7 +289,7 @@ const axios = require('axios');
           await sleep(1000);
       }
 
-      // Click on date input
+      log("click on date input");
       {
           const targetPage = page;
           const element = await waitForSelectors([["aria/Date of Appointment *"],["#appointments_consulate_appointment_date"]], targetPage, { timeout, visible: true });
@@ -284,7 +298,7 @@ const axios = require('axios');
           await sleep(1000);
       }
 
-      // Keep clicking next button until we find the first available date and click to that date
+      log("keep clicking next button until we find the first available date and click to that date");
       {
           const targetPage = page;
           while (true) {
@@ -305,7 +319,7 @@ const axios = require('axios');
           }
       }
 
-      // Select the first available Time from the time dropdown
+      log("select the first available Time from the time dropdown");
       {
           const targetPage = page;
           const element = await waitForSelectors([["#appointments_consulate_appointment_time"]], targetPage, { timeout, visible: true });
@@ -318,7 +332,7 @@ const axios = require('axios');
           await sleep(1000);
       }
 
-      // Click on reschedule button
+      log("click on reschedule button");
       {
           const targetPage = page;
           const element = await waitForSelectors([["aria/Reschedule"],["#appointments_submit"]], targetPage, { timeout, visible: true });
@@ -327,7 +341,7 @@ const axios = require('axios');
           await sleep(1000);
       }
 
-      // Click on submit button on the confirmation popup
+      log("click on submit button on the confirmation popup");
       {
         const targetPage = page;
         const element = await waitForSelectors([["aria/Cancel"],["body > div.reveal-overlay > div > div > a.button.alert"]], targetPage, { timeout, visible: true });
