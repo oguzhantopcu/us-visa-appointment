@@ -364,7 +364,7 @@ const axios = require('axios');
           break;
         }
       } catch (err){
-        // Swallow the error and keep running in case we encountered an error.
+        log(err)
       }
 
       await sleep(retryTimeout);
