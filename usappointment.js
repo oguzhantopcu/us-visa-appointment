@@ -4,7 +4,7 @@ const axios = require('axios');
 
 (async () => {
     //#region Command line args
-    const args = parseArgs(process.argv.slice(2), {string: ['u', 'p', 'c', 'a', 'n', 'd', 'r', "mn", "l"], boolean: ['g']})
+    const args = parseArgs(process.argv.slice(2), {string: ['u', 'p', 'c', 'a', 'n', 'd', 'r', "mn", "l", "s"], boolean: ['g']})
     const currentDate = new Date(args.d);
     const usernameInput = args.u;
     const passwordInput = args.p;
@@ -14,6 +14,7 @@ const axios = require('axios');
     const userToken = args.n;
     const appToken = args.m;
     const groupAppointment = args.g;
+    const noSandbox = args.s;
     const lang = args.l;
     const region = args.r;
     //#endregion
@@ -134,10 +135,17 @@ const axios = require('axios');
     async function runLogic() {
       log("launching browser...");
 
-      //#region Init puppeteer
-      const browser = await puppeteer.launch({
+      var pSettings ={
         headless: true
-      });
+      };
+
+      if (noSandbox) {
+        log("no sandbox")
+
+        pSettings["args"] = ['--no-sandbox', '--disable-gpu', '--disable-setuid-sandbox'];
+      }
+      //#region Init puppeteer
+      const browser = await puppeteer.launch(pSettings);
 
       log("launched");
 
