@@ -133,7 +133,7 @@ const axios = require('axios');
     //#endregion
 
     async function runLogic() {
-      log("launching browser...");
+      log("launching browser");
 
       var pSettings ={
         headless: true
