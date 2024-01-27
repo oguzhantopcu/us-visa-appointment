@@ -1,6 +1,7 @@
 {
   "dependencies": {
-    "minimist": "^1.2.6",
-    "puppeteer": "^13.5.2"
+    "axios": "^1.6.7",
+    "minimist": "^1.2.8",
+    "puppeteer": "^13.7.0"
   }
 }
