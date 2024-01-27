@@ -4,7 +4,7 @@ const axios = require('axios');
 
 (async () => {
     //#region Command line args
-    const args = parseArgs(process.argv.slice(2), {string: ['u', 'p', 'c', 'a', 'n', 'd', 'r', "m", "l", "s"], boolean: ['g']})
+    const args = parseArgs(process.argv.slice(2), {string: ['u', 'p', 'c', 'a', 'n', 'd', 'r', "m", "l"], boolean: ['g','s']})
     const currentDate = new Date(args.d);
     const usernameInput = args.u;
     const passwordInput = args.p;
