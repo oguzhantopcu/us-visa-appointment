@@ -32,7 +32,7 @@ const axios = require("axios");
       } catch (err) {}
     }
     throw new Error(
-      "Could not find element for selectors: " + JSON.stringify(selectors),
+      "could not find element for selectors: " + JSON.stringify(selectors),
     );
   }
 
@@ -69,7 +69,7 @@ const axios = require("axios");
       selector = [selector];
     }
     if (!selector.length) {
-      throw new Error("Empty selector provided to waitForSelector");
+      throw new Error("empty selector provided to waitForSelector");
     }
     let element = null;
     for (let i = 0; i < selector.length; i++) {
@@ -80,7 +80,7 @@ const axios = require("axios");
         element = await frame.waitForSelector(part, options);
       }
       if (!element) {
-        throw new Error("Could not find element: " + selector.join(">>"));
+        throw new Error("could not find element: " + selector.join(">>"));
       }
       if (i < selector.length - 1) {
         element = (
@@ -91,7 +91,7 @@ const axios = require("axios");
       }
     }
     if (!element) {
-      throw new Error("Could not find element: " + selector.join("|"));
+      throw new Error("could not find element: " + selector.join("|"));
     }
     return element;
   }
@@ -108,7 +108,7 @@ const axios = require("axios");
       }
       await new Promise((resolve) => setTimeout(resolve, 100));
     }
-    throw new Error("Timed out");
+    throw new Error("timed out");
   }
 
   async function sleep(timeout) {
@@ -361,7 +361,7 @@ const axios = require("axios");
         }
 
         notify(
-          "Found an earlier date! " + firstDate.toISOString().slice(0, 10),
+          "found an earlier date! " + firstDate.toISOString().slice(0, 10),
         );
       }
 
