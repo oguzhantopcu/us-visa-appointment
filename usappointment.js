@@ -4,7 +4,7 @@ const axios = require('axios');
 
 (async () => {
     //#region Command line args
-    const args = parseArgs(process.argv.slice(2), {string: ['u', 'p', 'c', 'a', 'n', 'd', 'r', "m", "l"], boolean: ['g','s']})
+    const args = parseArgs(process.argv.slice(2), {string: ['u', 'p', 'c', 'a', 'n', 'd', 'r', "m", "l"], boolean: ['g','s','v']})
     const currentDate = new Date(args.d);
     const usernameInput = args.u;
     const passwordInput = args.p;
@@ -16,6 +16,7 @@ const axios = require('axios');
     const groupAppointment = args.g;
     const noSandbox = args.s;
     const lang = args.l;
+    const visible = args.v;
     const region = args.r;
     //#endregion
 	
@@ -135,9 +136,13 @@ const axios = require('axios');
     async function runLogic() {
       log("launching browser");
 
-      var pSettings ={
+      var pSettings = {
         headless: true
       };
+
+      if (visible) {
+        pSettings.headless = false;
+      }
 
       if (noSandbox) {
         log("no sandbox")
@@ -146,6 +151,8 @@ const axios = require('axios');
       }
       //#region Init puppeteer
       const browser = await puppeteer.launch(pSettings);
+
+      try {
 
       log("launched");
 
@@ -259,7 +266,7 @@ const axios = require('axios');
 
           if (availableDates.length <= 0) {
             log("there are no available dates for consulate with id " + consularId);
-            await browser.close();
+
             return false;
           }
           
@@ -267,7 +274,7 @@ const axios = require('axios');
 
           if (firstDate > currentDate) {
             log("there is not an earlier date available than " + currentDate.toISOString().slice(0,10));
-            await browser.close();
+            
             return false;
           }
 
@@ -361,11 +368,13 @@ const axios = require('axios');
         await page.click('body > div.reveal-overlay > div > div > a.button.alert');
         await sleep(5000);
       }
-
-      await browser.close();
+    }
+    finally {
+      browser.close();
+    }
       return true;
       //#endregion
-    }
+  }
 
     notify("test notification");
 
