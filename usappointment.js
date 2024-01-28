@@ -21,6 +21,7 @@ const axios = require("axios");
   const lang = args.l;
   const visible = args.v;
   const region = args.r;
+  working = false;
   //#endregion
 
   //#region Helper functions
@@ -536,17 +537,29 @@ const axios = require("axios");
     //#endregion
   }
 
-  notify("test notification");
+  notify("app started");
 
   while (true) {
     try {
       const result = await runLogic();
+
+      if (!working) {
+        notify("working without problems");
+        
+        working = true;
+      }
 
       if (result) {
         notify("successfully scheduled a new appointment");
         break;
       }
     } catch (err) {
+      if (working) {
+        notify("stopped working");
+
+        working = false;
+      }
+      
       log(err);
     }
 
