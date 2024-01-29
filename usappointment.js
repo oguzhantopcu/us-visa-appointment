@@ -21,9 +21,11 @@ const axios = require("axios");
   const lang = args.l;
   const visible = args.v;
   const region = args.r;
-  working = false;
-  notWorkingSince = new Date();
-  notifiedNotWorking = new Date();
+  var working = false;
+  var notWorkingSince = new Date();
+  var notifiedNotWorking = new Date();
+  var firstDate = null;
+
   //#endregion
 
   //#region Helper functions
@@ -321,7 +323,7 @@ const axios = require("axios");
         await element.click({ offset: { x: 34, y: 11.34375 } });
         await targetPage.waitForNavigation();
       }
-
+      
       log("we are logged in now. check available dates from the API");
       {
         const targetPage = page;
@@ -351,13 +353,14 @@ const axios = require("axios");
           return false;
         }
 
-        const firstDate = new Date(availableDates[0].date);
+        firstDate = new Date(availableDates[0].date);
 
         if (firstDate > currentDate) {
           log(
             "there is not an earlier date available than " +
-              currentDate.toISOString().slice(0, 10),
-          );
+            currentDate.toISOString().slice(0, 10) + 
+            ", first available date is " 
+            + firstDate.toISOString().slice(0, 10));
 
           return false;
         }
@@ -492,6 +495,29 @@ const axios = require("axios");
               await element.click({ offset: { x: 4, y: 9.03125 } });
             }
           }
+        }
+      }
+
+      log("ensure that we picked the correct time")
+      {
+        const targetPage = page;
+        const element = await waitForSelectors(
+          [["#appointments_consulate_appointment_date"]],
+          targetPage,
+          { timeout, visible: true },
+        );
+
+        var pickedDateStr = await element.evaluate((el) => el.value);
+        var firstDateStr = firstDate.toISOString().slice(0, 10);
+
+        if (pickedDateStr != firstDateStr){
+          notify("sorry, the date " + 
+          firstDateStr + 
+          "is no longer available, available date at the textbox is " + 
+          pickedDateStr + 
+          ". someone moved a bit faster.")
+
+          return false;
         }
       }
 
