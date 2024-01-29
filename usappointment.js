@@ -22,6 +22,8 @@ const axios = require("axios");
   const visible = args.v;
   const region = args.r;
   working = false;
+  notWorkingSince = new Date();
+  notifiedNotWorking = new Date();
   //#endregion
 
   //#region Helper functions
@@ -548,29 +550,60 @@ const axios = require("axios");
     //#endregion
   }
 
-  notify("app started");
+  function isMinutesAgoOrMore(targetDate, minutesThreshold) {
+    // Get the current date and time
+    const currentDate = new Date();
+  
+    // Calculate the time difference in milliseconds
+    const timeDifference = currentDate - targetDate;
+  
+    // Convert minutes threshold to milliseconds
+    const thresholdInMilliseconds = minutesThreshold * 60 * 1000;
+  
+    // Check if the time difference is greater than or equal to the specified threshold
+    return timeDifference >= thresholdInMilliseconds;
+  }
+
+  notify("app started to look appointment dates earlier than " + currentDate.toISOString().slice(0, 10));
 
   while (true) {
     try {
       const result = await runLogic();
 
-      if (!working) {
-        notify("working without problems");
-        
-        working = true;
-      }
+      working = true;
 
       if (result) {
         notify("successfully scheduled a new appointment");
       }
-    } catch (err) {
-      if (working) {
-        notify("stopped working");
-
-        working = false;
+     } 
+     catch (err) {
+      if (!notWorkingSince) {
+        notWorkingSince = new Date();
       }
+
+      working = false;
       
       log(err);
+    }
+
+    if (working) {
+      var okMessage = "working properly";
+      if (notifiedNotWorking) {
+        notify(okMessage);
+        
+        notifiedNotWorking = false;
+      } else {
+        log(okMessage)
+      }
+    } else {
+      var errorMessage = "there is a problem since " + notWorkingSince;
+      if (isMinutesAgoOrMore(notWorkingSince, 60) && !notifiedNotWorking) {
+        notify(errorMessage);
+
+        notifiedNotWorking = true;
+      } else{
+        log(errorMessage)
+      }
     }
 
     await sleep(retryTimeout);
