@@ -366,7 +366,15 @@ const axios = require("axios");
           "found an earlier date! " + firstDate.toISOString().slice(0, 10),
         );
 
+        // exclude asia trip
         if (firstDate < new Date("2024-06-01") && firstDate > new Date("2024-03-01")){
+          notify("the day is not in the available area for you, sorry :(")
+
+          return false;
+        }
+
+        // exclude military service
+        if (firstDate < new Date("2024-09-22") && firstDate > new Date("2024-08-21")) {
           notify("the day is not in the available area for you, sorry :(")
 
           return false;
