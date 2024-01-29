@@ -25,6 +25,7 @@ const axios = require("axios");
   var notWorkingSince = new Date();
   var notifiedNotWorking = new Date();
   var firstDate = null;
+  var maxDatePickerAttempts = 12 * 2;
 
   //#endregion
 
@@ -460,7 +461,15 @@ const axios = require("axios");
       );
       {
         const targetPage = page;
+
+        var count = 0;
         while (true) {
+          if (++count > maxDatePickerAttempts){
+            log("cancelled date picking, something is off");
+
+            return false;
+          }
+          
           try {
             const element = await waitForSelectors(
               [
