@@ -533,6 +533,11 @@ const axios = require("axios");
     } finally {
       browser.close();
     }
+
+    log("set new date")
+    
+    currentDate = firstDate;
+
     return true;
     //#endregion
   }
@@ -551,7 +556,6 @@ const axios = require("axios");
 
       if (result) {
         notify("successfully scheduled a new appointment");
-        break;
       }
     } catch (err) {
       if (working) {
