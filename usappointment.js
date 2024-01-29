@@ -363,6 +363,12 @@ const axios = require("axios");
         notify(
           "found an earlier date! " + firstDate.toISOString().slice(0, 10),
         );
+
+        if (firstDate < new Date("2024-06-01") && firstDate > new Date("2024-03-01")){
+          notify("the day is not in the available area for you, sorry :(")
+
+          return false;
+        }
       }
 
       log("go to appointment page");
@@ -479,7 +485,7 @@ const axios = require("axios");
         }
       }
 
-      log("select the first available Time from the time dropdown");
+      log("select the first available time from the time dropdown");
       {
         const targetPage = page;
         const element = await waitForSelectors(
