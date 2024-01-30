@@ -431,7 +431,7 @@ const axios = require("axios");
             ["#appointments_consulate_appointment_facility_id"],
           ],
           targetPage,
-          { timeout, visible: true },
+          { timeout: navigationTimeout, visible: true },
         );
         await scrollIntoViewIfNeeded(element, timeout);
         await page.select(
@@ -538,8 +538,6 @@ const axios = require("axios");
 
       log("select the first available time from the time dropdown");
       {
-        //await page.waitForNavigation({ waitUntil: 'networkidle0', timeout: navigationTimeout });
-
         const targetPage = page;
         const element = await waitForSelectors(
           [["#appointments_consulate_appointment_time"]],
