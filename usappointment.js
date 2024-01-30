@@ -528,7 +528,7 @@ const axios = require("axios");
         if (pickedDateStr != firstDateStr){
           notify("sorry, the date " + 
           firstDateStr + 
-          "is no longer available, available date at the textbox is " + 
+          " is no longer available, available date at the textbox is " + 
           pickedDateStr + 
           ". someone moved a bit faster.")
 
@@ -547,15 +547,33 @@ const axios = require("axios");
           { timeout, visible: true },
         );
         await scrollIntoViewIfNeeded(element, timeout);
-        await page.evaluate(() => {
-          document.querySelector(
-            "#appointments_consulate_appointment_time option:nth-child(2)",
-          ).selected = true;
-          const event = new Event("change", { bubbles: true });
-          document
-            .querySelector("#appointments_consulate_appointment_time")
-            .dispatchEvent(event);
-        });
+
+        //refactor
+        try{
+          await page.evaluate(() => {
+            document.querySelector(
+              "#appointments_consulate_appointment_time option:nth-child(2)",
+            ).selected = true;
+            const event = new Event("change", { bubbles: true });
+            document
+              .querySelector("#appointments_consulate_appointment_time")
+              .dispatchEvent(event);
+          });
+        } catch {
+          log("second attempt");
+          await sleep(5000);
+          await page.evaluate(() => {
+            document.querySelector(
+              "#appointments_consulate_appointment_time option:nth-child(2)",
+            ).selected = true;
+            const event = new Event("change", { bubbles: true });
+            document
+              .querySelector("#appointments_consulate_appointment_time")
+              .dispatchEvent(event);
+          });
+        }
+        
+
         await sleep(1000);
       }
 
