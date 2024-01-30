@@ -8,7 +8,6 @@ const axios = require("axios");
     string: ["u", "p", "c", "a", "n", "d", "r", "m", "l"],
     boolean: ["g", "s", "v"],
   });
-  const currentDate = new Date(args.d);
   const usernameInput = args.u;
   const passwordInput = args.p;
   const appointmentId = args.a;
@@ -21,6 +20,8 @@ const axios = require("axios");
   const lang = args.l;
   const visible = args.v;
   const region = args.r;
+  
+  var currentDate = new Date(args.d);
   var working = false;
   var notWorkingSince = new Date();
   var notifiedNotWorking = new Date();
@@ -585,7 +586,7 @@ const axios = require("axios");
       browser.close();
     }
 
-    log("set new date")
+    log("set new date as " + firstDate.toISOString().slice(0, 10));
     
     currentDate = firstDate;
 
