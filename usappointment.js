@@ -546,34 +546,27 @@ const axios = require("axios");
           targetPage,
           { timeout, visible: true },
         );
+        
         await scrollIntoViewIfNeeded(element, timeout);
 
-        //refactor
-        try{
-          await page.evaluate(() => {
-            document.querySelector(
-              "#appointments_consulate_appointment_time option:nth-child(2)",
-            ).selected = true;
-            const event = new Event("change", { bubbles: true });
-            document
-              .querySelector("#appointments_consulate_appointment_time")
-              .dispatchEvent(event);
-          });
-        } catch {
-          log("second attempt");
-          await sleep(5000);
-          await page.evaluate(() => {
-            document.querySelector(
-              "#appointments_consulate_appointment_time option:nth-child(2)",
-            ).selected = true;
-            const event = new Event("change", { bubbles: true });
-            document
-              .querySelector("#appointments_consulate_appointment_time")
-              .dispatchEvent(event);
-          });
-        }
+        await waitForSelectors(
+          [
+            ["#appointments_consulate_appointment_time option:nth-child(2)"],
+          ],
+          targetPage,
+          { timeout: navigationTimeout },
+        );
         
-
+        await page.evaluate(() => {
+          document.querySelector(
+            "#appointments_consulate_appointment_time option:nth-child(2)",
+          ).selected = true;
+          const event = new Event("change", { bubbles: true });
+          document
+            .querySelector("#appointments_consulate_appointment_time")
+            .dispatchEvent(event);
+        });
+        
         await sleep(1000);
       }
 
