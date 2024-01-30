@@ -440,7 +440,7 @@ const axios = require("axios");
         );
         await sleep(1000);
         
-        await page.waitForNavigation({ waitUntil: 'networkidle0', timeout });
+        await page.waitForNavigation({ waitUntil: 'networkidle0', timeout: navigationTimeout });
       }
 
       log("click on date input");
@@ -457,7 +457,7 @@ const axios = require("axios");
         await scrollIntoViewIfNeeded(element, timeout);
         await element.click({ offset: { x: 394.5, y: 17.53125 } });
 
-        await page.waitForNavigation({ waitUntil: 'networkidle0', timeout });
+        await page.waitForNavigation({ waitUntil: 'networkidle0', timeout: navigationTimeout });
 
         await sleep(1000);
       }
@@ -538,7 +538,7 @@ const axios = require("axios");
 
       log("select the first available time from the time dropdown");
       {
-        await page.waitForNavigation({ waitUntil: 'networkidle0', timeout });
+        await page.waitForNavigation({ waitUntil: 'networkidle0', timeout: navigationTimeout });
 
         const targetPage = page;
         const element = await waitForSelectors(
