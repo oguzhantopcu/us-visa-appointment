@@ -639,6 +639,8 @@ const axios = require("axios");
       } else {
         log(okMessage)
       }
+
+      notWorkingSince = null;
     } else {
       var errorMessage = "there is a problem since " + notWorkingSince;
       if (isMinutesAgoOrMore(notWorkingSince, 60) && !notifiedNotWorking) {
