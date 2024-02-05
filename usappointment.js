@@ -326,67 +326,7 @@ const axios = require("axios");
         await targetPage.waitForNavigation();
       }
       
-      log("we are logged in now. check available dates from the API");
-      {
-        const targetPage = page;
-        await page.setExtraHTTPHeaders({
-          Accept: "application/json, text/javascript, */*; q=0.01",
-          "X-Requested-With": "XMLHttpRequest",
-        });
-        const response = await targetPage.goto(
-          "https://ais.usvisa-info.com/" +
-            lang +
-            "-" +
-            region +
-            "/niv/schedule/" +
-            appointmentId +
-            "/appointment/days/" +
-            consularId +
-            ".json?appointments[expedite]=false",
-        );
-
-        const availableDates = JSON.parse(await response.text());
-
-        if (availableDates.length <= 0) {
-          log(
-            "there are no available dates for consulate with id " + consularId,
-          );
-
-          return false;
-        }
-
-        firstDate = new Date(availableDates[0].date);
-
-        if (firstDate > currentDate) {
-          log(
-            "there is not an earlier date available than " +
-            currentDate.toISOString().slice(0, 10) + 
-            ", first available date is " 
-            + firstDate.toISOString().slice(0, 10));
-
-          return false;
-        }
-
-        notify(
-          "found an earlier date! " + firstDate.toISOString().slice(0, 10),
-        );
-
-        // exclude asia trip
-        if (firstDate < new Date("2024-06-01") && firstDate > new Date("2024-03-01")){
-          notify("the day is not in the available area for you, sorry :(")
-
-          return false;
-        }
-
-        // exclude military service
-        if (firstDate < new Date("2024-09-22") && firstDate > new Date("2024-08-21")) {
-          notify("the day is not in the available area for you, sorry :(")
-
-          return false;
-        }
-      }
-
-      log("go to appointment page");
+      log("we are logged in now, go to appointment page");
       {
         const targetPage = page;
         await targetPage.goto(
@@ -438,9 +378,8 @@ const axios = require("axios");
           "#appointments_consulate_appointment_facility_id",
           consularId,
         );
-        await sleep(1000);
-        
-        //await page.waitForNavigation({ waitUntil: 'networkidle0', timeout: navigationTimeout });
+
+        await sleep(1000);         
       }
 
       log("click on date input");
@@ -456,8 +395,6 @@ const axios = require("axios");
         );
         await scrollIntoViewIfNeeded(element, timeout);
         await element.click({ offset: { x: 394.5, y: 17.53125 } });
-
-        //await page.waitForNavigation({ waitUntil: 'networkidle0', timeout: navigationTimeout });
 
         await sleep(1000);
       }
@@ -513,7 +450,7 @@ const axios = require("axios");
         }
       }
 
-      log("ensure that we picked the correct time")
+      log("ensure that we picked an earlier date")
       {
         const targetPage = page;
         const element = await waitForSelectors(
@@ -523,16 +460,17 @@ const axios = require("axios");
         );
 
         var pickedDateStr = await element.evaluate((el) => el.value);
-        var firstDateStr = firstDate.toISOString().slice(0, 10);
+        var pickedDate = new Date(pickedDateStr);
+        firstDate = pickedDate;
 
-        if (pickedDateStr != firstDateStr){
-          notify("sorry, the date " + 
-          firstDateStr + 
-          " is no longer available, available date at the textbox is " + 
-          pickedDateStr + 
-          ". someone moved a bit faster.")
+        if (pickedDate > currentDate){
+          log("the date on the textbox (" + pickedDateStr + ")is not earlier than ours");
 
           return false;
+        } else {
+          notify(
+            "found an earlier date! " + firstDate.toISOString().slice(0, 10),
+          );
         }
       }
 
