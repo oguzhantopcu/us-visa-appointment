@@ -371,7 +371,7 @@ const axios = require("axios");
             ["#appointments_consulate_appointment_facility_id"],
           ],
           targetPage,
-          { timeout: navigationTimeout, visible: true },
+          { timeout: timeout * 2, visible: true },
         );
         await scrollIntoViewIfNeeded(element, timeout);
         await page.select(
