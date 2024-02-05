@@ -26,7 +26,7 @@ const axios = require("axios");
   var notWorkingSince = new Date();
   var notifiedNotWorking = new Date();
   var firstDate = null;
-  var maxDatePickerAttempts = 12 * 2;
+  var maxDatePickerAttempts = 18;
 
   //#endregion
 
@@ -408,7 +408,7 @@ const axios = require("axios");
         var count = 0;
         while (true) {
           if (++count > maxDatePickerAttempts){
-            log("cancelled date picking, something is off");
+            log("cancelled date picking, could not find any availability up to " + maxDatePickerAttempts + " months");
 
             return false;
           }
@@ -461,10 +461,14 @@ const axios = require("axios");
 
         var pickedDateStr = await element.evaluate((el) => el.value);
         var pickedDate = new Date(pickedDateStr);
-        firstDate = pickedDate;
+        firstDate = pickedDate; 
 
         if (pickedDate > currentDate){
-          log("the date on the textbox (" + pickedDateStr + ")is not earlier than ours");
+          log("the date on the textbox (" + 
+          pickedDate.toISOString().slice(0, 10)
+          + ") is not earlier than ours (" + 
+          currentDate.toISOString().slice(0, 10) + 
+          ")");
 
           return false;
         } else {
