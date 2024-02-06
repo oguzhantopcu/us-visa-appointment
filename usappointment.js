@@ -478,6 +478,20 @@ const axios = require("axios");
         }
       }
 
+      // exclude asia trip
+      if (firstDate < new Date("2024-06-01") && firstDate > new Date("2024-03-03")){
+        notify("the day is not in the available area for you, sorry :(")
+
+        return false;
+      }
+
+      // exclude military service
+      if (firstDate < new Date("2024-09-22") && firstDate > new Date("2024-08-21")) {
+        notify("the day is not in the available area for you, sorry :(")
+
+        return false;
+      }
+
       log("select the first available time from the time dropdown");
       {
         const targetPage = page;
