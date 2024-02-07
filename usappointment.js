@@ -465,8 +465,8 @@ const axios = require("axios");
 
         if (pickedDate > currentDate){
           log("the date on the textbox (" + 
-          pickedDate.toISOString().slice(0, 10)
-          + ") is not earlier than ours (" + 
+          pickedDate.toISOString().slice(0, 10) + 
+          ") is not earlier than ours (" + 
           currentDate.toISOString().slice(0, 10) + 
           ")");
 
@@ -479,7 +479,7 @@ const axios = require("axios");
       }
 
       // exclude asia trip
-      if (firstDate < new Date("2024-06-01") && firstDate > new Date("2024-03-03")){
+      if (firstDate < new Date("2024-08-01") && firstDate > new Date("2024-03-03")){
         notify("the day is not in the available area for you, sorry :(")
 
         return false;
