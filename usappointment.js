@@ -479,7 +479,7 @@ const axios = require("axios");
       }
 
       // exclude asia trip
-      if (firstDate < new Date("2024-08-01") && firstDate > new Date("2024-03-03")){
+      if (firstDate < new Date("2024-07-15") && firstDate > new Date("2024-03-07")){
         notify("the day is not in the available area for you, sorry :(")
 
         return false;
